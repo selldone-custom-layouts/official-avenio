@@ -55,7 +55,15 @@
 ## Checks
 
 <!-- CHECKS:START -->
-(none yet)
+Fast checks (new-shop-kits/fast-checks) on https://avenio.selldone.shop, 16 Nov 2026:
+
+| Check | 1.0.0 (full run) | 1.0.2 (types its changes touch) |
+| --- | --- | --- |
+| ring, card-edge, corner, circle, cart, currency, text-col | 0 | (not touched) |
+| shape | 248 (off-scale corners on the flag cards and the play icon) | 0 |
+| contrast | 4 (the slides cross-fade caught half way) | 0 |
+| i18n (Arabic) | 104 (the new words had no Arabic yet) | 0 |
+| box, underline | 0 | 0 |
 <!-- CHECKS:END -->
 
 ## Releases
@@ -64,3 +72,4 @@
 | --- | --- | --- | --- | --- |
 | 1.0.0 | 16 Nov 2026 | 45 | 689 | First release: the department-store set on the Layout base. PROD-CHECK OK, server js/css match. Fast checks on live: ring, card-edge, corner, circle, cart, currency, box, text-col, underline 0; shape 248, i18n 104, contrast 4. |
 | 1.0.1 | 16 Nov 2026 | 45 | 690 | Slides move in instead of cross-fading (contrast), the flag cards and the play icon on the shape scale, Arabic for every new word and the slide titles, the shop data in Arabic (shop-data.ts + data/ar.json), the colour prompt in the listing. |
+| 1.0.2 | 16 Nov 2026 | 45 | 691 | "All departments" first in the bar, there from the first paint (the departments arrive with the catalogue, about 4 s on live; the shape check opened the bar before that), the bar's height reserved, the shopping bag in every drawing slot (no pastry drawings). Guest checkout walk: Add to bag opens the sign-in sheet (guest checkout is off in the shop, the owner's setting), in the Layout's look at 1440 and 390; no order. |
