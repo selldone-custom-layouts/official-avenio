@@ -43,7 +43,7 @@
 .av-tick:is(.ly,.ly *) { margin: 0; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .av-tick:is(.ly,.ly *) .tk-l { color: inherit; animation: av-tk .35s ease both; }
 a.tk-l:hover:is(.ly,.ly *) { color: var(--ly-top-hover); }
-@keyframes av-tk { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@keyframes av-tk { from { transform: translateY(6px); } to { transform: none; } }
 @media (prefers-reduced-motion: reduce) { .av-tick:is(.ly,.ly *) .tk-l { animation: none; } }
 
 @media (min-width: 980px) {
