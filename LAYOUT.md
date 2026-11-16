@@ -14,9 +14,31 @@
 
 ## Home
 
-1. **hero** (split): The shop's name and line on the left; the counter photo bleeding to the right edge of the frame, a framed inset across the seam with the best seller, the three most-ordered collections set large on the photo's dark corner (from Pralino).
-2. **collections** (cards): The same four as a 2 × 2 grid of cards, the photo on top inside the card (Domino).
-3. **journal** (photo, tint band): The four newest posts beside a tall photo with the big word 'Journal' (from Pralino; best last).
+1. **event** (band): the store headline on the family-dark band, the live best saving and a button per department.
+2. **slides** (wide): wide photo slides bound to departments (skin design.slides), live saving and lowest price, pause button.
+3. **departments** (tiles): Shop by department, one photo tile per category with products.
+4. **flags** (cards, tint band): four tall cards picked by live rules (newest, deepest deal, best value, top brand).
+5. **prices** (tabs-row): Great prices, tabs (On sale, Under $x, a department on sale) and a product row beside the sale card.
+6. **pricepoints** (tiles, tint band): Shop by price, Under $x tiles from the live prices.
+7. **dealrows** (rows): Deals by department, up to three rows.
+8. **feature** (split): one photo banner bound to a department (skin design.feature).
+9. **brands** (tiles, tint band): Brands we love, typeset brand names from the live catalogue.
+10. **finds** (tabs-row): Don't miss these finds, tabs Newest, Best value and two departments.
+11. **edits** (banners): two wide photo banners bound to departments (skin design.edits).
+12. **services** (cards, tint band): service promises from the shop's real ways, payment and hours.
+13. **clearance** (row): Biggest savings, a product row by percent off.
+14. **journal** (cards): The newest three posts as cards with photo, date and title (Avenio).
+
+## The department-store set (Avenio's own, on top of the base)
+
+- **Header:** a deals ticker in the top bar (the departments with the deepest live saving, then the shop's ways to receive an order), the wordmark left, a wide search field, account and bag; under it the **department bar** (every category with products, then Deals) whose buttons open a **five-column mega menu** (Featured, Shop by size from the variants, Brands, Shop by price, the department's photo card). `components/ly/dept/AvTicker.vue`, `AvDeptBar.vue`.
+- **Home sections:** `components/ly/home/sections/dept/`, shared reads in `components/ly/dept/dept.ts` and `dept-section.ts`, the product row in `DeptRail.vue`; the skin's `design` block binds the slides, the feature and the edits to category slugs (a missing slug falls back to the ranked departments).
+- **Listing:** the filter panel is an "All filters" drawer at every width; `?max=`, `?sale=1` and `?size=` open it pre-filtered (the mega menu's links); five cards across from 1360 px.
+- **Card:** the brand in bold, the name in two lines, "Sale", the price with "(N% off)", colour dots.
+- **Product page:** a thumbnail rail beside a 3:4 photo; the brand, colour circles and size boxes (one group per variant dimension; pattern keys never print raw), Add to bag + Buy now, the receive lines as tiles; the buy bar at every width.
+- **Empty categories** (audience folders without products) stay out of every menu and row until they get products (`components/ly/ly.ts` loadDm).
+- **Words:** the base's bakery copy is replaced in `skins/avenio/skin.json` words.en (store wording, clothing FAQ).
+- **Loading:** the bag line art (`avenio-design/loading/`), continued by the in-app splash (`LySplash.vue` ART.bag).
 
 ## Photos
 

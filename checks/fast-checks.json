@@ -51,7 +51,7 @@
   "selectors": {
     "bag": ".bag-btn",
     "menu": ".menu-btn",
-    "mega": "[aria-controls=dd-shop]",
+    "mega": ".db-li:first-child .db-a",
     "footer": ".ftr",
     "themeRow": ".ftr .ts-row"
   },

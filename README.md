@@ -48,9 +48,20 @@ Everything is read live from the shop: its title (drawn as the wordmark), collec
 
 | # | Section | Variant | What it shows |
 | --- | --- | --- | --- |
-| 1 | `hero` | `split` | The shop's name and line on the left; the counter photo bleeding to the right edge of the frame, a framed inset across the seam with the best seller, the three most-ordered collections set large on the photo's dark corner (from Pralino). |
-| 2 | `collections` | `cards` | The same four as a 2 × 2 grid of cards, the photo on top inside the card (Domino). |
-| 3 | `journal` | `photo` | The four newest posts beside a tall photo with the big word 'Journal' (from Pralino; best last). |
+| 1 | `event` | `band` | Avenio: the store headline on the family-dark band, the live best saving and a button per department. |
+| 2 | `slides` | `wide` | Avenio: wide photo slides bound to departments (skin design.slides), live saving and lowest price, pause button. |
+| 3 | `departments` | `tiles` | Avenio: Shop by department, one photo tile per category with products. |
+| 4 | `flags` | `cards` | Avenio: four tall cards picked by live rules (newest, deepest deal, best value, top brand). |
+| 5 | `prices` | `tabs-row` | Avenio: Great prices, tabs (On sale, Under $x, a department on sale) and a product row beside the sale card. |
+| 6 | `pricepoints` | `tiles` | Avenio: Shop by price, Under $x tiles from the live prices. |
+| 7 | `dealrows` | `rows` | Avenio: Deals by department, up to three rows. |
+| 8 | `feature` | `split` | Avenio: one photo banner bound to a department (skin design.feature). |
+| 9 | `brands` | `tiles` | Avenio: Brands we love, typeset brand names from the live catalogue. |
+| 10 | `finds` | `tabs-row` | Avenio: Don't miss these finds, tabs Newest, Best value and two departments. |
+| 11 | `edits` | `banners` | Avenio: two wide photo banners bound to departments (skin design.edits). |
+| 12 | `services` | `cards` | Avenio: service promises from the shop's real ways, payment and hours. |
+| 13 | `clearance` | `row` | Avenio: Biggest savings, a product row by percent off. |
+| 14 | `journal` | `cards` | The newest three posts as cards with photo, date and title (Avenio). |
 
 A section the shop has no data for hides itself; tint bands alternate with white.
 

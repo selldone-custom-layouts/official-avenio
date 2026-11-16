@@ -13,7 +13,7 @@ Avenio is drawn in one colour family: every colour on the page comes from the pa
 | Page | white | L .17 |
 | Bands, soft tint | L .985 | L .195 |
 | Cards | L .985, or white | L .225 |
-| Plates under the pastries | L .966 | L .26 |
+| Plates under the products | L .966 | L .26 |
 | Deeper tint (drawings, lines) | L .925 and .86 | L .31 |
 | The dark top bar and footer | L .24 | L .15 |
 

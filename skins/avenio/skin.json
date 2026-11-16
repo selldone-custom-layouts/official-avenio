@@ -229,13 +229,41 @@
     }
   },
   "loading": {
-    "art": "none"
+    "art": "bag"
   },
   "splash": {
-    "art": "none"
+    "art": "bag"
   },
   "words": {
     "en": {
+      "bakini.n.co.within": "Local delivery within {km} km of the store",
+      "bakini.n.rd.within": " within {km} km of the store",
+      "bakini.n.rd.fAt": "The store is at {address}.",
+      "bakini.n.rd.fq1": "Can I order just one item?",
+      "bakini.n.rd.fa1": "Yes. Every style is sold on its own: pick your colour and size, then add it to your bag.",
+      "bakini.n.rd.fq2": "How do I order more than one of the same style?",
+      "bakini.n.rd.fa2": "Add it to your bag, then press + beside it. Each press adds one more in the same colour and size, up to the number in stock.",
+      "bakini.n.rd.fa5": "Yes, with {name}.{fee}{free}.",
+      "bakini.n.rd.gAllergens": "Sizes & fit",
+      "bakini.n.rd.fq9": "How do I find my size?",
+      "bakini.n.rd.fa9": "Open \"Size details\" on the product page: it lists that style's own sizes and fit. If you are between sizes, write to us before you order: {reach}.",
+      "bakini.n.rd.fa9b": "Open \"Size details\" on the product page: it lists that style's own sizes and fit. If you are between sizes, write to us before you order.",
+      "bakini.n.rd.fq10": "Where can I see what a style is made of?",
+      "bakini.n.rd.fa10": "On the product page, under \"The details\": the fabric, the care instructions and the other facts the shop lists for that style.",
+      "bakini.n.rd.pChoices": "You can ask what details the shop holds about you, and ask for them to be corrected or deleted{ask}.",
+      "bakini.n.rd.pKeep": "Order records are kept as long as needed for the order and for the shop's records. You can ask for your account details to be removed.",
+      "bakini.n.rd.pWho": "The shop and the courier who delivers your order. Your details are not sold.",
+      "bakini.n.rd.tCancel": "To change or cancel an order, write to the shop from your order page or by email as early as possible, before the order is sent.",
+      "bakini.n.rd.tFreshT": "Sizes, care and returns",
+      "bakini.n.rd.tFresh": "Each product page lists the style's sizes, fabric and care instructions. If an item does not fit or arrives damaged, contact {shop} about a return or an exchange.",
+      "bakini.n.rd.tOrders": "An order is a request to buy the items in your bag at the prices shown at checkout. The shop confirms each order on the order page. If an item is no longer available, the shop contacts you before sending the order.",
+      "bakini.n.unit.piece": "item",
+      "ly.ftr.lineNone": "New styles every week.",
+      "ly.ftr.lineShip": "New styles every week, shipped to your door.",
+      "ly.home.soldOne": "Every size, every colour",
+      "ly.rd.fMessagePh": "A question about an order, a size, a return…",
+      "ly.rd.oneByOne": "Every size, every colour",
+      "ly.rd.qAllergens": "Sizes & fit",
       "ly.bag.emptyP": "Your bag is empty. Start with a department or today’s deals.",
       "ly.cmp.addOne": "Add a item",
       "ly.cmp.emptyP": "Choose two or more items to see them side by side.",

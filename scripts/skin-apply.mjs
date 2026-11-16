@@ -34,7 +34,7 @@ const { activeName } = require("./lib/skin.cjs");
 const CHECK = process.argv.includes("--check");
 const SECTIONS = JSON.parse(fs.readFileSync(path.join(ROOT, "components/ly/home/sections.json"), "utf8"));
 const ARTS = ["croissant", "cupcake", "tart", "whisk", "cake", "macaron", "none"];
-const LOADER_ARTS = ["croissant", "cupcake", "tart", "whisk", "none"];
+const LOADER_ARTS = ["croissant", "cupcake", "tart", "whisk", "bag", "none"];
 
 const name = activeName(ROOT);
 const skinDir = path.join(ROOT, "skins", name);
@@ -351,7 +351,7 @@ out.set(
       widths: [1440, 1024, 390],
       wide: [1920, 2560, 2880, 3840],
       basket: basket.one,
-      selectors: { bag: ".bag-btn", menu: ".menu-btn", mega: "[aria-controls=dd-shop]", footer: ".ftr", themeRow: ".ftr .ts-row" },
+      selectors: { bag: ".bag-btn", menu: ".menu-btn", mega: ".db-li:first-child .db-a", footer: ".ftr", themeRow: ".ftr .ts-row" },
       pages: {
         home: "/",
         category: ck.category || "#cat",
