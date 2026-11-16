@@ -64,7 +64,7 @@
     "product": "/product/710127",
     "compare": "/comparison?list=p710127_p710128_p710129",
     "blog": "/blog",
-    "article": "",
+    "article": "/blog",
     "about": "/about-us",
     "contact": "/contact-us",
     "faq": "/faq",
@@ -76,18 +76,73 @@
   },
   "home_sections": [
     {
-      "section": "hero",
+      "section": "event",
+      "variant": "band",
+      "band": false
+    },
+    {
+      "section": "slides",
+      "variant": "wide",
+      "band": false
+    },
+    {
+      "section": "departments",
+      "variant": "tiles",
+      "band": false
+    },
+    {
+      "section": "flags",
+      "variant": "cards",
+      "band": true
+    },
+    {
+      "section": "prices",
+      "variant": "tabs-row",
+      "band": false
+    },
+    {
+      "section": "pricepoints",
+      "variant": "tiles",
+      "band": true
+    },
+    {
+      "section": "dealrows",
+      "variant": "rows",
+      "band": false
+    },
+    {
+      "section": "feature",
       "variant": "split",
       "band": false
     },
     {
-      "section": "collections",
+      "section": "brands",
+      "variant": "tiles",
+      "band": true
+    },
+    {
+      "section": "finds",
+      "variant": "tabs-row",
+      "band": false
+    },
+    {
+      "section": "edits",
+      "variant": "banners",
+      "band": false
+    },
+    {
+      "section": "services",
       "variant": "cards",
+      "band": true
+    },
+    {
+      "section": "clearance",
+      "variant": "row",
       "band": false
     },
     {
       "section": "journal",
-      "variant": "photo",
+      "variant": "cards",
       "band": true
     }
   ],

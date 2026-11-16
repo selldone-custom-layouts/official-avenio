@@ -29,17 +29,20 @@
       </button>
     </div>
     <div class="pc-tx">
-      <p v-if="!noCat && catName" class="pc-c"><bdi>{{ catName }}</bdi></p>
+      <p v-if="brand" class="pc-b"><bdi>{{ brand }}</bdi></p>
+      <p v-else-if="!noCat && catName" class="pc-c"><bdi>{{ catName }}</bdi></p>
       <h3 class="pc-t">
         <router-link :to="to">{{ product.title }}</router-link>
       </h3>
-      <p class="pc-u">
-        {{ t("ly.card.per", "Per {unit}", { unit }) }}<template v-if="low">{{ " · " }}<span class="low">{{ t("ly.card.onlyLeft", "only {n} left", { n: product.quantity }) }}</span></template>
-      </p>
+      <p v-if="pv.off > 0" class="pc-sale">{{ t("av.card.sale", "Sale") }}</p>
       <p class="pc-ly">
         <span class="now money">{{ money(pv.now) }}</span><template v-if="pv.was">{{ " " }}<s class="was money">{{ money(pv.was) }}</s></template
-        ><span v-if="pv.save > 0" class="pc-sv">{{ t("ly.card.save", "Save {amount}", { amount: money(pv.save) }) }}</span>
+        ><span v-if="pv.off > 0" class="pc-sv">{{ t("av.card.off", "({off}% off)", { off: pv.off }) }}</span>
       </p>
+      <p v-if="dots.length > 1" :aria-label="t('av.card.colours', { one: '{n} colour', other: '{n} colours' }, { n: dots.length })" class="pc-dots" role="img">
+        <i v-for="c in dots.slice(0, 5)" :key="c" :style="{ background: c }" aria-hidden="true"></i><span v-if="dots.length > 5" aria-hidden="true">+{{ dots.length - 5 }}</span>
+      </p>
+      <p v-if="low" class="pc-u"><span class="low">{{ t("ly.card.onlyLeftCap", "Only {n} left", { n: product.quantity }) }}</span></p>
       <div class="pc-add"><ly-add :product="product" /></div>
     </div>
   </article>
@@ -49,6 +52,7 @@
 import LyIcon from "../LyIcon.vue";
 import LyAdd from "../LyAdd.vue";
 import { catOf, catTitle, money, openQuick, priceView, productImage, productTo, unitOf } from "../ly";
+import { brandOf, coloursOf } from "../dept/dept";
 import { dropSrcset, productSrcset } from "../../kalio/kalio-catalog";
 import { currentCurrency } from "../../region-switcher/region";
 import { fitInCircle } from "../../bakini/fit-in-circle";
@@ -88,6 +92,12 @@ export default {
     low() {
       const q = Number(this.product.quantity);
       return q > 0 && q <= 5;
+    },
+    brand() {
+      return brandOf(this.product);
+    },
+    dots() {
+      return coloursOf(this.product);
     },
     catName() {
       return catTitle(catOf(this.product.category_id));

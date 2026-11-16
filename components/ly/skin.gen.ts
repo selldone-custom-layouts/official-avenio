@@ -163,18 +163,73 @@ export const SKIN = {
   },
   "home": [
     {
-      "section": "hero",
+      "section": "event",
+      "variant": "band",
+      "band": false
+    },
+    {
+      "section": "slides",
+      "variant": "wide",
+      "band": false
+    },
+    {
+      "section": "departments",
+      "variant": "tiles",
+      "band": false
+    },
+    {
+      "section": "flags",
+      "variant": "cards",
+      "band": true
+    },
+    {
+      "section": "prices",
+      "variant": "tabs-row",
+      "band": false
+    },
+    {
+      "section": "pricepoints",
+      "variant": "tiles",
+      "band": true
+    },
+    {
+      "section": "dealrows",
+      "variant": "rows",
+      "band": false
+    },
+    {
+      "section": "feature",
       "variant": "split",
       "band": false
     },
     {
-      "section": "collections",
+      "section": "brands",
+      "variant": "tiles",
+      "band": true
+    },
+    {
+      "section": "finds",
+      "variant": "tabs-row",
+      "band": false
+    },
+    {
+      "section": "edits",
+      "variant": "banners",
+      "band": false
+    },
+    {
+      "section": "services",
       "variant": "cards",
+      "band": true
+    },
+    {
+      "section": "clearance",
+      "variant": "row",
       "band": false
     },
     {
       "section": "journal",
-      "variant": "photo",
+      "variant": "cards",
       "band": true
     }
   ],
@@ -195,7 +250,100 @@ export const SKIN = {
     "font": "\"DM Serif Display\", Georgia, \"Times New Roman\", serif"
   },
   "words": {
-    "en": {},
+    "en": {
+      "ly.bag.emptyP": "Your bag is empty. Start with a department or today’s deals.",
+      "ly.cmp.addOne": "Add a item",
+      "ly.cmp.emptyP": "Choose two or more items to see them side by side.",
+      "ly.cmp.find": "Find a item",
+      "ly.cmp.lead": "Side by side, from each item’s own details. Rows that match are folded into one line.",
+      "ly.cmp.noPick": "No item matches “{q}”.",
+      "ly.cmp.title": "Compare items",
+      "ly.co.bagLead": "Change sizes and quantities here, then choose how your order reaches you.",
+      "ly.co.comeToCounter": "Choose a window and come to the store",
+      "ly.co.emptyP": "Your bag is empty. Start with a department or today’s deals.",
+      "ly.ftr.lineBoth": "Come to the store, or let the courier come to you.",
+      "ly.ftr.linePickup": "Come to the store.",
+      "ly.hdr.everyPastry": "Everything",
+      "ly.hdr.searchLabel": "Search the store",
+      "ly.hdr.searchPh0": "Search the store…",
+      "ly.home.aboutAlt": "Items in the store",
+      "ly.home.aboutAt": "{shop} is a store at {street} in {city}.",
+      "ly.home.aboutEyebrow2": "Explore the store",
+      "ly.home.aboutIs": "{shop} is a store.",
+      "ly.home.aboutPickup": "wait in store for pickup",
+      "ly.home.bandAlt": "Items in the warm light of the shop",
+      "ly.home.courierWithin": "Local delivery within {km} km of the store.",
+      "ly.home.courierWithinShort": "Local delivery within {km} km of the store",
+      "ly.home.featPickupP": "At the store, {street}, every day {hours}.",
+      "ly.home.featPickupP0": "At the store.",
+      "ly.home.featPickupPh": "At the store, {street}, {hours}.",
+      "ly.home.featPickupPs": "At the store, {street}.",
+      "ly.home.featPieceP": "Every item is sold on its own, so you choose exactly the pieces you want.",
+      "ly.home.featPieceP3": "Every item is sold on its own — one {a}, one {b} or a single {c}.",
+      "ly.home.fromLine": "Every item in the store, from {price}",
+      "ly.home.galH": "{n} collections in store",
+      "ly.home.heroAlt": "The store",
+      "ly.home.heroH": "Every item, sold on its own",
+      "ly.home.howAlt": "A box of items by the window",
+      "ly.home.jEyebrow": "Inspired by the store",
+      "ly.home.leadWhere": "{count} from the store at {place}",
+      "ly.home.shopAll": "Shop every item",
+      "ly.home.tagline": "Every department, one bag",
+      "ly.ls.all": "Everything",
+      "ly.ls.allLead": "Every department in one place.",
+      "ly.ls.dealsNone": "Deals show here when the store has some.",
+      "ly.ls.noMatchP": "Search by product or brand — {examples} — or start from a department.",
+      "ly.ls.noneT": "Nothing matches these filters",
+      "ly.ls.pastries": "Products",
+      "ly.ls.searchLabel": "Search the store",
+      "ly.ls.searchT": "Search the store",
+      "ly.nf.h": "This page has moved",
+      "ly.nf.p": "The link may be old, or the page has moved. Search the store, or start again from the home page.",
+      "ly.nf.search": "Search the store",
+      "ly.nf.tryH": "A few things to try instead",
+      "ly.od.chatHello": "Questions about this order? Write here and the store answers in this chat.",
+      "ly.od.leadBaking": "Thank you — it’s being prepared.",
+      "ly.od.leadReady": "Thank you — it’s ready in store.",
+      "ly.od.offP": "Nothing more will happen with it. Write to the store if you have a question.",
+      "ly.od.pastries": "Items",
+      "ly.od.payAtCounter": "You pay in cash in store when you collect it.",
+      "ly.od.pickAt": "Pick it up in store",
+      "ly.pd.btThis": "{name} (this item)",
+      "ly.pd.btThisK": "This item",
+      "ly.pd.moreEyebrow": "From the same department",
+      "ly.pd.within": "Local delivery within {km} km of the store.",
+      "ly.rd.aboutLead": "A store at {place}.",
+      "ly.rd.byPickup": "wait in store for pickup",
+      "ly.rd.colsH.one": "One collection in store",
+      "ly.rd.colsH.other": "{w} collections in store",
+      "ly.rd.counterP": "Every piece is packed in store.",
+      "ly.rd.ctLede": "Come to the store, call, or write — the store answers every message.",
+      "ly.rd.noPostsP": "The store has not published any posts yet.",
+      "ly.rd.notes": "Notes from the store.",
+      "ly.rd.notesAt": "Notes from the store at {place}.",
+      "ly.rd.oneByOneP": "Every item is its own piece, with its own price.",
+      "ly.rd.oneByOneP3": "One {a}, one {b}, one {c} — every item is its own piece, with its own price.",
+      "ly.rd.openEveryFrom": "The store is open every day from {hours}.",
+      "ly.rd.openFrom": "The store is open {hours}.",
+      "ly.rd.plainAnswers": "Plain answers from the store",
+      "ly.rd.qPickup": "Pickup in store",
+      "ly.rd.sentP": "The store replies at the email you gave.",
+      "ly.rd.storyAt": "{shop} is a store at {address}.",
+      "ly.rd.storyIs": "{shop} is a store.",
+      "ly.rd.theCounter": "The store",
+      "ly.rd.writeTo": "Write to the store",
+      "ly.strip.contact": "Contact the store",
+      "ly.strip.findCounter": "Find the store",
+      "ly.strip.pickupT": "Pickup in store",
+      "ly.strip.within": "Local delivery within {km} km of the store.",
+      "ly.hdr.searchPh": "Search {examples} and more…",
+      "ly.ls.noneP": "Widen the price range or clear a filter to see more.",
+      "ly.ls.noMatchP0": "Try another word, or start from a department.",
+      "ly.ls.theCollection": "Department",
+      "ly.hdr.collections": "Departments",
+      "ly.ls.collections": "Departments",
+      "ly.ls.dealsLead": "{off}, already in the price. No code to enter."
+    },
     "ar": {}
   }
 } as const;

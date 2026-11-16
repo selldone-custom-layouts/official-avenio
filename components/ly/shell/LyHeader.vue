@@ -28,11 +28,7 @@
 
     <div class="topbar">
       <div class="wrap tb-in">
-        <ul v-if="facts.ready" :aria-label="t('ly.hdr.facts', 'Shop facts')" class="tb-l">
-          <li v-if="openLine">{{ openLine }}</li>
-          <li v-if="facts.gateway?.name">{{ facts.gateway.name }}</li>
-          <li v-if="facts.pickup && street">{{ t("ly.hdr.pickupAt", "Pickup at {street}", { street }) }}</li>
-        </ul>
+        <av-ticker class="tb-l" />
         <ul :aria-label="t('ly.hdr.contact', 'Contact')" class="tb-r">
           <li v-if="regionOn" class="tb-rg">
             <button
@@ -112,8 +108,8 @@
         <ly-logo />
 
         <div class="tools">
-          <button :aria-expanded="is('srch') ? 'true' : 'false'" :aria-label="t('ly.hdr.search', 'Search')" aria-controls="srch" class="ibtn" type="button" @click="toggle('srch', $event)">
-            <ly-icon name="search" />
+          <button :aria-expanded="is('srch') ? 'true' : 'false'" :aria-label="t('ly.hdr.search', 'Search')" aria-controls="srch" class="ibtn av-sf" type="button" @click="toggle('srch', $event)">
+            <ly-icon name="search" /><span aria-hidden="true" class="av-sf-t">{{ t("av.hdr.searchPh", "Search the store") }}</span>
           </button>
           <router-link :aria-label="t('ly.hdr.account', 'Account')" :to="accountTo" class="ibtn acct"><ly-icon name="user" /></router-link>
           <button
@@ -129,6 +125,8 @@
           <a :href="orderHref" class="btn sm alt order" @click.prevent="orderNow">{{ t("ly.hdr.orderNow", "Order now") }}</a>
         </div>
       </div>
+
+      <av-dept-bar />
 
       <!-- Search: suggestions while typing (the live catalogue); Enter opens every result. -->
       <div id="srch" :class="['srch', { open: is('srch') }]" role="search">
@@ -259,6 +257,8 @@
 
 <script>
 import LyLogo from "../LyLogo.vue";
+import AvDeptBar from "../dept/AvDeptBar.vue";
+import AvTicker from "../dept/AvTicker.vue";
 import LyIcon from "../LyIcon.vue";
 import LyBagDrawer from "./LyBagDrawer.vue";
 import LyQuickView from "../ui/LyQuickView.vue";
@@ -298,7 +298,7 @@ const STOP = new Set(["and", "with", "the", "of", "a", "an", "in", "on", "mini",
 
 export default {
   name: "LyHeader",
-  components: { LyLogo, LyIcon, LyBagDrawer, LyQuickView, RegionChips },
+  components: { LyLogo, LyIcon, LyBagDrawer, LyQuickView, RegionChips, AvDeptBar, AvTicker },
   props: {
     showSearch: { type: Boolean, default: true },
   },

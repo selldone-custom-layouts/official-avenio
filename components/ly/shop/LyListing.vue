@@ -156,7 +156,7 @@
               <div class="lst-main">
                 <div class="lst-bar">
                   <button v-if="filters" :aria-controls="fpId" :aria-expanded="layer.open === fpId ? 'true' : 'false'" class="btn quiet sm fbtn" type="button" @click="toggleLayer(fpId, $event.currentTarget)">
-                    <ly-icon name="filter" />{{ t("ly.ls.filterBtn", "Filter") }}<span v-if="active.length" class="fcount">{{ active.length }}</span>
+                    <ly-icon name="filter" />{{ t("av.ls.allFilters", "All filters") }}<span v-if="active.length" class="fcount">{{ active.length }}</span>
                   </button>
                   <div class="actf">
                     <button v-for="a in active" :key="a.id" :aria-label="t('ly.ls.removeFilter', 'Remove filter {name}', { name: a.label })" class="chip on" type="button" @click="a.clear()">
@@ -260,6 +260,7 @@ export default {
     drawn: 0,
     snapshot: null,
     moreOpen: {},
+    size: "",
     wide: true,
     posts: [],
     fitStyle: null,
@@ -294,8 +295,9 @@ export default {
       if (this.deals) return "deals";
       return "all";
     },
+    /* Avenio: the "All filters" drawer on every listing */
     filters() {
-      return this.kind === "category";
+      return true;
     },
     cat() {
       return this.ly.cats.find((c) => c.name === this.categoryName) || null;
@@ -372,6 +374,7 @@ export default {
         const now = this.pv(p).now;
         if (this.hi > this.lo && (now < this.min - 0.001 || now > this.max + 0.001)) return false;
         if (this.offer && !(this.pv(p).save > 0)) return false;
+        if (this.size && !(p.product_variants || []).some((v) => v && v.enable !== false && (v.type === this.size || v.volume === this.size))) return false;
         for (const k of Object.keys(this.f)) if (this.f[k].length && !this.f[k].includes(String(specValue(p, k)))) return false;
         return true;
       });
@@ -384,6 +387,7 @@ export default {
       const out = [];
       for (const k of Object.keys(this.f)) for (const v of this.f[k]) out.push({ id: k + ":" + v, label: v, clear: () => this.toggle(k, v) });
       if (this.offer) out.push({ id: "offer", label: t("ly.ls.onOffer", "On offer"), clear: () => this.setOffer(false) });
+      if (this.size) out.push({ id: "size", label: t("av.ls.size", "Size {size}", { size: this.size }), clear: () => { this.size = ""; this.update(); } });
       if (this.hi > this.lo && (this.min > this.lo || this.max < this.hi))
         out.push({
           id: "price",
@@ -511,12 +515,16 @@ export default {
 
   created() {
     loadDm();
+    /* Avenio: the mega menu's "On sale" (?sale=1) and "Shop by size" (?size=) links */
+    if (this.$route?.query?.sale === "1") this.offer = true;
+    this.size = String(this.$route?.query?.size || "");
     this.sort = this.kind === "deals" ? "saving" : this.kind === "search" ? "best" : { most_sales: "best", newest: "new", cheapest: "low", most_expensive: "high" }[this.initialSort] || "featured";
   },
 
   mounted() {
     this.unfit = fitOnResize(() => fitInCircle(this.$refs.dtsv));
-    this.mq = window.matchMedia("(min-width: 1200px)");
+    /* Avenio: the filters are a drawer at every width (the department store's "All filters") */
+    this.mq = window.matchMedia("(min-width: 100000px)");
     this.wide = this.mq.matches;
     this.onMq = () => {
       this.wide = this.mq.matches;
@@ -609,6 +617,9 @@ export default {
     resetRange() {
       this.min = this.lo;
       this.max = this.hi;
+      /* Avenio: "Under $x" links (?max=) start with that ceiling */
+      const mx = Number(this.$route?.query?.max);
+      if (mx > 0 && this.hi > this.lo) this.max = Math.max(this.lo, Math.min(this.hi, Math.floor(mx)));
     },
     /* Fewer results than columns: the cards keep their width and the row is centred. */
     fit() {

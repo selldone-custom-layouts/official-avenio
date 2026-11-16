@@ -45,9 +45,9 @@
 
       <div class="pd-buy">
         <router-link v-if="cat" :to="catTo(cat)" class="eyebrow pd-cat"><bdi>{{ catName }}</bdi></router-link>
+        <router-link v-if="brand" :to="brandLink" class="pd-brand"><bdi>{{ brand }}</bdi></router-link>
         <h1 class="pd-h">{{ $product.title }}</h1>
-        <p class="pd-u">
-          {{ t("ly.card.per", "Per {unit}", { unit }) }} ·
+        <p v-if="$product.rate_count" class="pd-u">
           <a class="pd-rv" href="#tabs" @click.prevent="goReviews">{{ reviewsWord }}</a>
         </p>
 
@@ -62,7 +62,7 @@
         <template v-else>
           <div class="pd-price">
             <span class="now money">{{ money(pv.now) }}</span><s v-if="pv.was" class="was money">{{ money(pv.was) }}</s
-            ><span v-if="pv.save > 0" class="save">{{ t("ly.pd.save", "Save {amount} · {off}%", { amount: money(pv.save), off: pv.off }) }}</span>
+            ><span v-if="pv.save > 0" class="save">{{ t("av.pd.off", "({off}% off)", { off: pv.off }) }}</span>
           </div>
           <p v-if="dealEndsAt" class="pd-stock ly-pd-deal"><ly-icon name="clock" />{{ t("ly.pd.dealEnds", "Deal ends in") }}{{ " " }}<bakini-deal-clock :end="dealEndsAt" mode="bare" /></p>
         </template>
@@ -76,8 +76,31 @@
         </p>
         <p v-if="!has_original_warranty" class="pd-u">{{ $t("product_info.fake") }}</p>
 
+        <!-- Avenio: colour circles and size boxes, one group per dimension that varies. -->
+        <div v-if="groups.length" class="av-opts">
+          <div v-for="g in groups" :key="g.key" :class="['opts', 'av-g', 'g-' + g.key]">
+            <p class="opts-l">
+              {{ g.word }}<span class="opts-v">{{ g.current || t("av.pd.choose", "Choose") }}</span>
+            </p>
+            <div :aria-label="g.word" class="av-gv" role="radiogroup">
+              <button
+                v-for="o in g.options"
+                :key="o.value"
+                :aria-checked="o.on ? 'true' : 'false'"
+                :aria-label="o.label + (o.out ? ' · ' + t('ly.pd.soldOut', 'Sold out') : '')"
+                :class="['av-o', { on: o.on, '-out': o.out }]"
+                :title="g.key === 'color' ? o.label : undefined"
+                role="radio"
+                type="button"
+                @click="pick(g.key, o.value)"
+              >
+                <i v-if="g.key === 'color'" :style="{ background: o.swatch }" aria-hidden="true" class="av-sw"></i><span v-else>{{ o.label }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
         <!-- Options: only for a product that really has them. -->
-        <div v-if="tiles.length" class="opts">
+        <div v-else-if="tiles.length" class="opts">
           <p class="opts-l">
             {{ dimWord }}<span v-if="currentLabel" class="opts-v">{{ currentLabel }}</span>
           </p>
@@ -138,8 +161,9 @@
               class="ly-sd-buy"
             ></s-product-section-buy-button>
           </div>
-          <button class="btn soft cmpb" type="button" @click="compareNow"><ly-icon name="compare" />{{ t("ly.pd.compare", "Compare") }}</button>
+          <button v-if="simple" :aria-disabled="needsChoice || stock <= 0 ? 'true' : undefined" :class="['btn', 'av-buynow', { '-off': needsChoice || stock <= 0 }]" type="button" @click="buyNow">{{ t("av.pd.buyNow", "Buy now") }}</button>
         </div>
+        <button class="av-cmp" type="button" @click="compareNow"><ly-icon name="compare" />{{ t("ly.pd.compare", "Compare") }}</button>
 
         <ul v-if="lines.length" class="ils">
           <ly-ic-line v-for="l in lines" :key="l.key" :icon="l.icon" :text="l.line" :title="l.title" />
@@ -177,6 +201,8 @@ import LyIcon from "../LyIcon.vue";
 import LyIcLine from "../ui/LyIcLine.vue";
 import LyPdAdd from "./LyPdAdd.vue";
 import { catOf, catTitle, catTo, ly, money, priceView, unitOf } from "../ly";
+import { brandOf, brandTo, dimWord, dimensionsOf, optionLabel } from "../dept/dept";
+import { addVariant, basketLine } from "../../kalio/kalio-basket";
 import { deliveryLines, galleryOf, isEnglish, plural } from "./pd";
 import { colourName, dealEnd, moneyOf, swatchBg, variantDimension } from "../../bakini/bakini";
 import { currentCurrency } from "../../region-switcher/region";
@@ -235,6 +261,36 @@ export default {
     },
     lines() {
       return deliveryLines(this.shop || this.$shop);
+    },
+    brand() {
+      return brandOf(this.$product);
+    },
+    brandLink() {
+      return brandTo(this.brand);
+    },
+    /* Avenio: one group per dimension that varies (colour circles, size boxes), when the product has two or more
+       dimensions (one dimension keeps the base's tiles with their photo and price). */
+    groups() {
+      const vs = this.enabledVariants;
+      const dims = dimensionsOf(vs);
+      if (!dims.length || dims.length > 3 || (dims.length === 1 && dims[0].key === "color")) return [];
+      const cur = this.current_variant;
+      return dims.map((d) => ({
+        key: d.key,
+        word: t("av.pd.dim." + d.key, dimWord(d.key)),
+        current: cur ? optionLabel(d.key, String(cur[d.key] ?? ""), d.values.indexOf(String(cur[d.key] ?? ""))) : "",
+        options: d.values.map((value, i) => {
+          const match = vs.filter((v) => String(v[d.key] ?? "").trim() === value);
+          const same = cur ? match.find((v) => dims.every((o) => o.key === d.key || String(v[o.key] ?? "") === String(cur[o.key] ?? ""))) : null;
+          return {
+            value,
+            label: optionLabel(d.key, value, i),
+            swatch: d.key === "color" ? swatchBg(value) : null,
+            on: !!cur && String(cur[d.key] ?? "").trim() === value,
+            out: !(same ? same.quantity > 0 : match.some((v) => v.quantity > 0)),
+          };
+        }),
+      }));
     },
     enabledVariants() {
       return this.product_variants.filter((v) => v.enable !== false && v.enable !== 0);
@@ -349,6 +405,26 @@ export default {
         .map((r) => `p${r.p}${r.v ? `v${r.v}` : ""}`)
         .join("_");
       this.$router.push({ name: window.$storefront.routes.COMPARISON_PAGE, query: { list } });
+    },
+    /* Avenio: a value in one group keeps the other groups' choices when such a variant exists, else the first one
+       with this value that is in stock. */
+    pick(key, value) {
+      const vs = this.enabledVariants;
+      const cur = this.current_variant;
+      const dims = dimensionsOf(vs);
+      const match = vs.filter((v) => String(v[key] ?? "").trim() === value);
+      const same = cur ? match.find((v) => dims.every((o) => o.key === key || String(v[o.key] ?? "") === String(cur[o.key] ?? ""))) : null;
+      const next = same || match.find((v) => v.quantity > 0) || match[0];
+      if (next) this.current_variant = next;
+    },
+    /* Buy now: the chosen piece in the bag (once), then the bag page. */
+    buyNow() {
+      if (this.needsChoice || this.stock <= 0) return;
+      const p = this.$product;
+      const line = this.current_variant ? basketLine(this, p, { id: this.current_variant.id }) : basketLine(this, p);
+      const go = () => this.$router.push({ name: window.$storefront.routes.BASKET_PAGE, params: { type: p.type || "PHYSICAL" } });
+      if (line) return go();
+      Promise.resolve(addVariant(this, p, this.current_variant)).finally(() => setTimeout(go, 350));
     },
     toAdd() {
       this.$refs.add?.scrollIntoView({ behavior: "smooth", block: "center" });

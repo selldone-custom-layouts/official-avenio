@@ -44,6 +44,14 @@ export function loadDm(): void {
   catalogue().then((list) => {
     ly.products = list;
     ly.ready = true;
+    /* Avenio: a category without products (an audience folder still being filled) stays out of every menu and
+       row until it gets products; kept when the catalogue is empty or every product sits elsewhere. */
+    const keep = (cats: any[]) => {
+      const own = cats.filter((c) => list.some((p: any) => p.category_id === c.id));
+      return own.length ? own : cats;
+    };
+    if (ly.catsReady) ly.cats = keep(ly.cats);
+    else aisles().then((cats) => (ly.cats = keep(cats)));
   });
 }
 
