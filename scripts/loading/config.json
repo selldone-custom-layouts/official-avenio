@@ -1,0 +1,15 @@
+{
+ "name": "fashioni",
+ "art": "none",
+ "bg": "#ffffff",
+ "ink": "#2b1e1e",
+ "muted": "#695959",
+ "accent": "#9b1b30",
+ "line": "#f0d9d9",
+ "serif": "DM+Serif+Display:wght@400",
+ "sans": "Figtree:wght@700",
+ "serifCss": "\"DM Serif Display\",Georgia,serif",
+ "sansCss": "\"Figtree\",system-ui,sans-serif",
+ "nameWeight": 400,
+ "nameTracking": "-.01em"
+}

@@ -1,0 +1,340 @@
+{
+  "$schema": "../../layout-base/skin.schema.json",
+  "$comment": "Avenio skin (phase 2, 16 Nov 2026). Department-store sections live in avenio-layout (components/ly/home/sections/dept/); listed in its sections.json.",
+  "name": "avenio",
+  "package": "avenio-department-store",
+  "title": "Avenio Department Store",
+  "description": "A department-store Layout: a deals ticker, a department bar with five-column mega menus, an event band with department buttons, wide photo slides, deal rows, price-point tiles, brand tiles, a five-across listing with a filter drawer and colour prompt, and a two-column product page with size boxes, Add to bag + Buy now and pickup / delivery tiles. One wine-red colour family, crisp 4/8 px corners, DM Serif Display over Figtree.",
+  "summary": "Department-store Layout: deals ticker, mega menus, event band, deal rows, price tiles, brand tiles, five-across listing, two-column product page.",
+  "tagline": "Every department, one bag.",
+  "kind": "Department store · single shop",
+  "tags": [
+    "fashion",
+    "department-store",
+    "single-vendor",
+    "rtl"
+  ],
+  "shop": {
+    "name": "fashioni",
+    "id": 15552,
+    "xapi": "fashioni",
+    "domain": "avenio.selldone.shop",
+    "currency": "USD",
+    "country": "US",
+    "language": "en",
+    "homeIsPage": "31218",
+    "$homeNote": "The shop's Home is page 31218 (Page Builder). Set home=shop on avenio.selldone.shop only (selldone_shop_home_domain_set), never on the shop default."
+  },
+  "github": {
+    "org": "selldone-custom-layouts",
+    "repo": "official-avenio",
+    "topics": [
+      "selldone",
+      "selldone-layout",
+      "storefront",
+      "vue",
+      "fashion",
+      "department-store"
+    ]
+  },
+  "dev": {
+    "port": 9172
+  },
+  "checks": {
+    "product": "710127",
+    "product2": "710203",
+    "category": "/dresses-one-pieces-category",
+    "search": "dress",
+    "compare": "p710127_p710128_p710129",
+    "i18nIgnore": "Cash on delivery|Worldwide shipping"
+  },
+  "palettes": {
+    "brand": "garnet",
+    "mode": "light",
+    "list": [
+      {
+        "id": "garnet",
+        "name": "Garnet",
+        "seed": "#9b1b30"
+      },
+      {
+        "id": "emerald",
+        "name": "Emerald",
+        "seed": "#1d6b55"
+      },
+      {
+        "id": "sapphire",
+        "name": "Sapphire",
+        "seed": "#264a96"
+      },
+      {
+        "id": "ochre",
+        "name": "Ochre",
+        "seed": "#9a6a12"
+      },
+      {
+        "id": "onyx",
+        "name": "Onyx",
+        "seed": "#2e2f33"
+      }
+    ],
+    "$dark": "family near-black grounds (Garnet about #1a0a0e), white words, the action colour lifted to the family 300; the ticker becomes the family 900 with 100 words"
+  },
+  "fonts": {
+    "display": {
+      "family": "DM Serif Display",
+      "google": "DM+Serif+Display:ital@0;1",
+      "stack": "\"DM Serif Display\", Georgia, \"Times New Roman\", serif",
+      "$use": "wordmark, event headline, section titles, the one italic word in a headline; never prices"
+    },
+    "text": {
+      "family": "Figtree",
+      "google": "Figtree:wght@400;500;600;700;800",
+      "stack": "\"Figtree\", \"Noto Sans Arabic\", \"Segoe UI\", system-ui, sans-serif",
+      "$use": "everything else, prices and '% off' included (bold 700 for brand lines and prices)"
+    },
+    "headingWeight": 400
+  },
+  "shape": {
+    "panel": 8,
+    "inner": 4,
+    "$language": "crisp: buttons, fields, chips, size boxes, tiles and photos 4 px; panels, drawers, sheets and the mega menu 8 px; circles only for swatches, icon buttons and the heart. No capsules anywhere (the other Fashioni Layout is capsule-based)."
+  },
+  "wordmark": {
+    "case": "first",
+    "italic": false,
+    "dot": false,
+    "sub": "none",
+    "weight": 400,
+    "tracking": "-.01em",
+    "size": 34
+  },
+  "basket": {
+    "one": "bag",
+    "many": "bags"
+  },
+  "home": [
+    {
+      "section": "hero",
+      "variant": "split"
+    },
+    {
+      "section": "collections",
+      "variant": "cards"
+    },
+    {
+      "section": "journal",
+      "variant": "photo",
+      "band": true
+    }
+  ],
+  "photos": {
+    "hero-1": {
+      "size": [
+        2400,
+        900
+      ],
+      "note": "evening gown on a marble staircase; left 40% calm for white words"
+    },
+    "hero-2": {
+      "size": [
+        2400,
+        900
+      ],
+      "note": "runners in activewear; left 40% calm for dark words"
+    },
+    "hero-3": {
+      "size": [
+        2400,
+        900
+      ],
+      "note": "shoes and a tote on travertine plinths; left 45% calm"
+    },
+    "feature": {
+      "size": [
+        1400,
+        1050
+      ],
+      "note": "sunglasses and bags still life, fills the frame"
+    },
+    "edit-1": {
+      "size": [
+        1600,
+        900
+      ],
+      "note": "camel overcoat on an autumn street; left calm for white words"
+    },
+    "edit-2": {
+      "size": [
+        1600,
+        900
+      ],
+      "note": "white tee and denim shorts by the sea; left calm for dark words"
+    },
+    "collections": {
+      "size": [
+        1400,
+        1050
+      ],
+      "pattern": "col-<slug of the category title>",
+      "note": "centred subject: the same file serves the square tile and the wide listing banner (object-fit cover)"
+    }
+  },
+  "loading": {
+    "art": "none"
+  },
+  "splash": {
+    "art": "none"
+  },
+  "words": {},
+  "design": {
+    "header": {
+      "ticker": {
+        "new": true,
+        "label": "Today's deals",
+        "lines": "from live data: 'Up to N% off <department>' for the 4 departments with the deepest discount, plus 'Free pickup' / 'Delivery' only when the shop has that method",
+        "band": "family 100, words family 900"
+      },
+      "row": "wordmark left · wide search field (4 px) · account · bag",
+      "departments": {
+        "new": true,
+        "items": "'All departments' + every category with products, deals item last in the family colour",
+        "menu": "click opens (second click / Esc / outside closes); 5 columns: the department's products by type, by size or fit (from live 'type' sizes), featured brands, edits (New, On sale, Under $N), a promo photo card (col-<slug>)"
+      }
+    },
+    "listing": {
+      "new": true,
+      "banner": "compact (≤ 220 px): breadcrumb, category name in the display face, one line, the col-<slug> photo in a 4 px frame on the right; products visible on first load",
+      "chips": "a scroller of 4 px chips from live spec values (Occasion, Fit) or sibling departments",
+      "toolbar": "All filters (left drawer: Size, Colour, Price, Brand, Material, Fit, On sale) · quick buttons Size, Colour, Price, On sale · density 4 | 5 · Sort (Featured, Newest, Price ↑, Price ↓, Biggest saving, Most viewed, Top rated)",
+      "grid": "5 across at 1440, 4 at 1100, 2 on a phone; card: 3:4 photo (contain on the family 50 plate), ♡ top-right, brand bold, name 2 lines, 'SALE' label in the family colour, price + '(N% off)', struck price, ★ only with ratings, colour dots (+n), 'Choose size' / 'Add to bag' outline button",
+      "prompt": "after row 3: 'What colour are you looking for?' panel with colour chips from the live variant colours (hex → nearest name)"
+    },
+    "product": {
+      "new": true,
+      "gallery": "vertical thumbnail rail + one large 3:4 photo, ♡ and zoom; phone: brand + name above a swipe gallery",
+      "buy": "sticky column: brand, name, ★ (only with ratings), price + struck + '(N% off)', 'Colour: <name>' circles, 'Size: <x> · Size guide' 4 px boxes from 'type', Add to bag (solid) + Buy now (outline) side by side, 3 receive tiles (Pickup / Delivery / Shipping, only the shop's real methods), offers list only when real (coupons, cashback)",
+      "details": "two columns: description + Features (pros) | Size & fit · Materials & care · Delivery & returns (from spec + shop policy); 'View full details'",
+      "rows": "Similar items, More from <brand> (current product excluded)",
+      "bar": "after the buy box scrolls away: Colour · Size · Edit + Add to bag + Buy now (scroll listener, not IntersectionObserver)"
+    },
+    "fallback": "every photo slot falls back to a collage of that department's own product photos on the family 50 plate, so the Layout is complete with no photos",
+    "hidden": [
+      "the shop description while it is Selldone's default text",
+      "categories with no products (Women, Men, Girls, Boys, Baby today) until they get products",
+      "product counts in customer text"
+    ],
+    "homePlan": [
+      {
+        "section": "event",
+        "variant": "band",
+        "band": "dark",
+        "new": true,
+        "data": "headline + 'Up to N% off' from the live max discount; department buttons = categories with products"
+      },
+      {
+        "section": "slides",
+        "variant": "wide",
+        "new": true,
+        "photos": [
+          "hero-1",
+          "hero-2",
+          "hero-3"
+        ],
+        "data": "each slide bound to a category (Dresses, Activewear, Footwear) with its live 'from $X'; pause button, progress fill, reduced motion"
+      },
+      {
+        "section": "departments",
+        "variant": "tiles",
+        "new": true,
+        "photos": [
+          "col-*"
+        ],
+        "data": "'Shop by department': 8 photo tiles, caption under, 'Up to N% off' line only when real"
+      },
+      {
+        "section": "flags",
+        "variant": "cards",
+        "band": true,
+        "new": true,
+        "data": "4 tall cards: NEW (newest), DEAL (deepest %), VALUE (lowest price), POPULAR (most viewed); real product photo, contain"
+      },
+      {
+        "section": "prices",
+        "variant": "tabs-row",
+        "new": true,
+        "data": "'Great prices': tabs On sale / Under $25 / Under $50 / <dept> on sale + a tall family card on the left + a product row"
+      },
+      {
+        "section": "pricepoints",
+        "variant": "tiles",
+        "band": true,
+        "new": true,
+        "data": "'Shop by price': 4 tiles from live price quartiles, link to the listing with a price filter"
+      },
+      {
+        "section": "dealrows",
+        "variant": "rows",
+        "new": true,
+        "data": "'Deals by department': up to 3 rows (departments with the most discounted items), photo cards with the big '40% OFF' on a family plate"
+      },
+      {
+        "section": "feature",
+        "variant": "split",
+        "new": true,
+        "photos": [
+          "feature"
+        ],
+        "data": "family pattern panel + headline + button | still-life photo; Bags & Accessories + Sunglasses"
+      },
+      {
+        "section": "brands",
+        "variant": "tiles",
+        "band": true,
+        "new": true,
+        "data": "'Brands we love': typeset brand names (no logos), one row of 10, 'See all' opens the rest; each opens a search for the brand"
+      },
+      {
+        "section": "finds",
+        "variant": "tabs-row",
+        "new": true,
+        "data": "'Don't miss these': Newest / Most viewed / Top rated (only with ratings) / Bags & accessories"
+      },
+      {
+        "section": "edits",
+        "variant": "banners",
+        "new": true,
+        "photos": [
+          "edit-1",
+          "edit-2"
+        ],
+        "data": "two wide banners side by side: Jackets & Layers, Tops & Shorts"
+      },
+      {
+        "section": "services",
+        "variant": "cards",
+        "band": true,
+        "new": true,
+        "data": "4 promise cards from real shop facts only (pickup, delivery ways, returns text, payment); a card with no fact is dropped"
+      },
+      {
+        "section": "clearance",
+        "variant": "row",
+        "new": true,
+        "data": "'Biggest savings': product row by % off"
+      },
+      {
+        "section": "signup",
+        "variant": "band",
+        "band": "dark",
+        "new": true,
+        "data": "newsletter sign-up on the family dark, no promised discount"
+      },
+      {
+        "section": "journal",
+        "variant": "cards",
+        "data": "articles, date not reading time; always last"
+      }
+    ]
+  }
+}
