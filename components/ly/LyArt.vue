@@ -14,6 +14,10 @@
 <script>
 import { ART } from "./ly-icons";
 
+/* Avenio: no pastry drawings in a department store; every drawing slot (title bands, the empty bag, a photo
+   slot's fallback) shows the shopping bag of the loading screen and the splash. */
+const BAG = '<path d="M28 46h64l-5 58H33z"/><path d="M45 46v-8c0-9 6-16 15-16s15 7 15 16v8"/><path d="M40 60h40"/>';
+
 export default {
   name: "LyArt",
   props: {
@@ -23,7 +27,7 @@ export default {
   },
   computed: {
     paths() {
-      return ART[this.name] || "";
+      return this.name === "none" ? "" : BAG || ART[this.name] || "";
     },
   },
 };

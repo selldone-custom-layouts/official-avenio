@@ -6,9 +6,15 @@
   By price (Under $x from its own prices) and the department's photo card with its live saving.
 -->
 <template>
-  <nav v-if="depts.length" :aria-label="t('av.depts', 'Departments')" class="av-dbar">
+  <nav v-if="!ly.ready || depts.length" :aria-label="t('av.depts', 'Departments')" class="av-dbar">
     <div class="wrap db-in">
       <ul class="db-list">
+        <!-- "All departments": there from the first paint (the departments arrive with the catalogue) -->
+        <li class="db-li">
+          <button :aria-expanded="layer.open === 'mm-all' ? 'true' : 'false'" aria-controls="mm-all" class="db-a all" type="button" @click="toggleLayer('mm-all', $event.currentTarget)">
+            {{ t("av.db.all", "All departments") }}<ly-icon cls="chev" name="down" />
+          </button>
+        </li>
         <li v-for="c in depts" :key="c.id" class="db-li">
           <button
             :aria-controls="'mm-' + c.id"
@@ -24,6 +30,21 @@
           <router-link :to="saleTo()" class="db-a sale">{{ t("av.db.deals", "Deals") }}</router-link>
         </li>
       </ul>
+    </div>
+    <div v-show="layer.open === 'mm-all'" id="mm-all" :aria-label="t('av.db.all', 'All departments')" class="av-mm" role="region">
+      <div v-if="layer.open === 'mm-all'" class="wrap mm-all">
+        <p class="mm-h">{{ t("av.db.all", "All departments") }}</p>
+        <ul v-if="depts.length" class="mm-tiles">
+          <li v-for="c in depts" :key="c.id">
+            <router-link :to="catTo(c)" class="mm-tile">
+              <span :class="['mm-ph', { plate: !photoOf(c).own }]"><img v-if="photoOf(c).src" :src="photoOf(c).src" alt="" loading="lazy" /></span>
+              <b><bdi>{{ catTitle(c) }}</bdi></b>
+              <span v-if="deptDeal(c)" class="mm-off">{{ t("av.upTo", "Up to {off}% off", { off: deptDeal(c) }) }}</span>
+            </router-link>
+          </li>
+        </ul>
+        <p v-else class="mm-wait">{{ t("av.db.loading", "Loading the departments…") }}</p>
+      </div>
     </div>
     <div v-for="c in depts" v-show="layer.open === 'mm-' + c.id" :id="'mm-' + c.id" :key="'mm' + c.id" :aria-label="catTitle(c)" class="av-mm" role="region">
       <div v-if="layer.open === 'mm-' + c.id" class="wrap mm-in">

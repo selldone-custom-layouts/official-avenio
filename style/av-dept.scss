@@ -343,3 +343,14 @@ a.tk-l:hover:is(.ly,.ly *) { color: var(--ly-top-hover); }
 .av-cq-c:hover:is(.ly,.ly *) { color: var(--ly-act-text); }
 .av-cq-c[aria-pressed="true"]:is(.ly,.ly *) { box-shadow: inset 0 0 0 2px var(--ly-ink); }
 .av-cq-c:is(.ly,.ly *) i { width: 18px; height: 18px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .18); }
+
+/* "All departments" and the bar's reserved height (no jump when the departments arrive) */
+.av-dbar:is(.ly,.ly *) .db-in { min-height: 46px; }
+.db-a.all:is(.ly,.ly *) { font-weight: 800; }
+.mm-all:is(.ly,.ly *) { padding-block: 24px 28px; }
+.mm-tiles:is(.ly,.ly *) { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; }
+.mm-tile:is(.ly,.ly *) { display: grid; gap: 6px; color: var(--ly-ink); }
+.mm-tile:hover:is(.ly,.ly *) { color: var(--ly-act-text); }
+.mm-tile:is(.ly,.ly *) b { font: 700 14.5px/1.3 var(--ly-sans); }
+.mm-off:is(.ly,.ly *) { font: 600 13px/1.3 var(--ly-sans); color: var(--ly-act-text); }
+.mm-wait:is(.ly,.ly *) { margin: 0; min-height: 120px; font: 500 14px/1.5 var(--ly-sans); color: var(--ly-muted); }

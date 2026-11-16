@@ -10,7 +10,7 @@
 | Names | `manifest.json` and `selldone-layout.json` from the skin (`package` is permanent after the first upload; the `description` must be right on the FIRST upload, Selldone keeps it) |
 | Dev server | port **9172**, shop `fashioni` (`.env`); `npm run serve` (launch entry `avenio-layout`) |
 | Skin | Garnet, Emerald, Sapphire, Ochre, Onyx (brand `garnet`), DM Serif Display over Figtree, radius 8 / 4 px, basket word "bag" |
-| Layout id | (after the first upload) |
+| Layout id | **45** (pinned on avenio.selldone.shop only, domain 1257; the shop default and every other domain keep theirs) |
 
 ## Home
 
@@ -62,3 +62,5 @@
 
 | Version | Date | Layout | Deploy | What |
 | --- | --- | --- | --- | --- |
+| 1.0.0 | 16 Nov 2026 | 45 | 689 | First release: the department-store set on the Layout base. PROD-CHECK OK, server js/css match. Fast checks on live: ring, card-edge, corner, circle, cart, currency, box, text-col, underline 0; shape 248, i18n 104, contrast 4. |
+| 1.0.1 | 16 Nov 2026 | 45 | 690 | Slides move in instead of cross-fading (contrast), the flag cards and the play icon on the shape scale, Arabic for every new word and the slide titles, the shop data in Arabic (shop-data.ts + data/ar.json), the colour prompt in the listing. |

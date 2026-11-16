@@ -470,7 +470,9 @@ export const SKIN = {
       "av.title.sunglasses": "أكمل إطلالتك",
       "av.title.jackets-layers": "طبقات للأيام الباردة",
       "av.title.tops-t-shirts": "قمصان وشورتات مريحة",
-      "av.ls.colour": "اللون"
+      "av.ls.colour": "اللون",
+      "av.db.all": "كل الأقسام",
+      "av.db.loading": "جارٍ تحميل الأقسام…"
     }
   }
 } as const;
