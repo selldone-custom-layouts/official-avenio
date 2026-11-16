@@ -99,6 +99,12 @@ async function shoot(phone, mode, jobs, after) {
                 await add.click();
                 await pg.waitForTimeout(2000);
               }
+              /* a shop without guest checkout asks the guest to sign in first: close the sheet, the bag stays as it is */
+              if (await pg.locator("#lg-m").filter({ visible: true }).count()) {
+                await pg.keyboard.press("Escape");
+                await pg.waitForTimeout(800);
+                break;
+              }
             }
             await push(pg, "/basket/PHYSICAL");
             await settle(pg, 4500);
