@@ -2,8 +2,8 @@
   Wide photo slides (sections.json "slides"/"wide"): the skin's hero-1..3 photos, each bound to a department by the
   skin (design.slides[{ photo, cat, title, tone }]); a missing department falls back to the ranked departments,
   a missing photo to the department's own products on the family plate. The words come from the live data: the
-  department, "From $x", "Up to N% off". Changes every 7 s with a pause button and a progress line; no motion
-  when the visitor asks for less.
+  department, "From $x", "Up to N% off". Changes every 7 s (the new slide moves in over the old one: no cross-fade, so no half-transparent words) with a
+  pause button and a progress line; no motion when the visitor asks for less.
 -->
 <template>
   <section v-if="slides.length" :aria-label="t('av.sl.aria', 'Featured departments')" aria-roledescription="carousel" class="av-slides">
@@ -14,7 +14,7 @@
           :key="s.key"
           :aria-hidden="i === at ? undefined : 'true'"
           :aria-label="t('av.sl.n', 'Slide {n} of {total}', { n: i + 1, total: slides.length })"
-          :class="['sl', 'tone-' + s.tone, { on: i === at }]"
+          :class="['sl', 'tone-' + s.tone, { on: i === at, anim: moved }]"
           aria-roledescription="slide"
           role="group"
         >
@@ -44,7 +44,7 @@
             <span></span>
           </button>
           <button :aria-label="playing ? t('av.sl.pause', 'Pause slides') : t('av.sl.play', 'Play slides')" :aria-pressed="playing ? 'false' : 'true'" class="sl-pp" type="button" @click="toggle">
-            <span v-if="playing" aria-hidden="true" class="pp-pause"><i></i><i></i></span><span v-else aria-hidden="true" class="pp-play"></span>
+            <span v-if="playing" aria-hidden="true" class="pp-pause"><i></i><i></i></span><svg v-else aria-hidden="true" class="pp-play" viewBox="0 0 12 12"><path d="M3 1.5v9l7.5-4.5z" fill="currentColor" /></svg>
           </button>
         </div>
       </div>
@@ -54,13 +54,14 @@
 
 <script>
 import deptSection from "../../../dept/dept-section";
+import { slugOf } from "../../../dept/dept";
 
 const MS = 7000;
 
 export default {
   name: "SlidesWide",
   mixins: [deptSection],
-  data: () => ({ at: 0, playing: true }),
+  data: () => ({ at: 0, playing: true, moved: false }),
   computed: {
     slides() {
       if (!this.ready) return [];
@@ -79,7 +80,7 @@ export default {
           tone: w.tone || "dark",
           photo: this.slot(w.photo),
           plates: this.inStock(ps).slice(0, 3),
-          title: w.title || this.t("av.sl.h", "New in {name}", { name: this.catTitle(c) }),
+          title: w.title ? this.t("av.title." + slugOf(c), w.title) : this.t("av.sl.h", "New in {name}", { name: this.catTitle(c) }),
           off: this.deptDeal(c),
           from: this.fromPrice(ps),
         });
@@ -106,11 +107,13 @@ export default {
       clearTimeout(this.timer);
       if (!this.playing || this.slides.length < 2) return;
       this.timer = setTimeout(() => {
+        this.moved = true;
         this.at = (this.at + 1) % this.slides.length;
         this.arm();
       }, MS);
     },
     show(i) {
+      this.moved = true;
       this.at = i;
       this.arm();
     },

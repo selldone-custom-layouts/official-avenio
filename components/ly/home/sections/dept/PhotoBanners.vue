@@ -27,6 +27,7 @@
 
 <script>
 import deptSection from "../../../dept/dept-section";
+import { slugOf } from "../../../dept/dept";
 
 export default {
   name: "PhotoBanners",
@@ -58,7 +59,7 @@ export default {
             photo: this.slot(w.photo),
             plates: this.inStock(ps).slice(0, 3),
             names: [this.catTitle(c), c2 && c2.id !== c.id ? this.catTitle(c2) : ""].filter(Boolean).join(" · "),
-            title: w.title || this.catTitle(c),
+            title: w.title ? this.t("av.title." + slugOf(c), w.title) : this.catTitle(c),
             line: [off ? this.upTo(off) : "", from ? this.t("av.from", "From {price}", { price: from }) : ""].filter(Boolean).join(" · "),
           };
         })

@@ -174,6 +174,15 @@
                     </ul>
                   </div>
                 </div>
+                <!-- Avenio: "What colour are you looking for?" from the live variant colours (nearest names) -->
+                <div v-if="colours.length >= 3" :aria-label="t('av.ls.colourQ', 'What colour are you looking for?')" class="av-cq" role="group">
+                  <p class="av-cq-h">{{ t("av.ls.colourQ", "What colour are you looking for?") }}</p>
+                  <div class="av-cq-l">
+                    <button v-for="c in colours" :key="c.name" :aria-pressed="colour === c.name ? 'true' : 'false'" class="av-cq-c" type="button" @click="setColour(c.name)">
+                      <i :style="{ background: c.hex }" aria-hidden="true"></i><span>{{ c.name }}</span>
+                    </button>
+                  </div>
+                </div>
                 <p :class="['upd', { on: busy }]" aria-live="polite"><span aria-hidden="true" class="spin"></span>{{ t("ly.ls.updating", "Updating results…") }}</p>
                 <div v-if="!ready" class="grid">
                   <div v-for="i in 10" :key="i" aria-hidden="true" class="pc ly-skel"><div class="pc-plate"></div><div class="pc-tx"><span class="sk-l"></span><span class="sk-l s"></span></div></div>
@@ -225,6 +234,7 @@ import { breakable, fitInCircle } from "../../bakini/fit-in-circle";
 import { fitOnResize } from "../ly-fit";
 import { t } from "../../kalio/i18n/kalio-i18n";
 import { collectionPhoto } from "../ly-photos";
+import { colourChoices, hasColour } from "../dept/dept";
 
 /* A spec key whose every value reads like a paragraph is a note, not a filter. */
 const NOTE = 80;
@@ -261,6 +271,7 @@ export default {
     snapshot: null,
     moreOpen: {},
     size: "",
+    colour: "",
     wide: true,
     posts: [],
     fitStyle: null,
@@ -365,6 +376,10 @@ export default {
       if (this.kind === "search") return s.filter((x) => x[0] !== "review").sort((a, b) => (a[0] === "best" ? -1 : b[0] === "best" ? 1 : 0));
       return s;
     },
+    /* Avenio: the colours of the products on this page, the most common first (twelve at most) */
+    colours() {
+      return colourChoices(this.base).slice(0, 12);
+    },
     sortLabel() {
       return (this.sorts.find((s) => s[0] === this.sort) || this.sorts[0])[1];
     },
@@ -374,6 +389,7 @@ export default {
         const now = this.pv(p).now;
         if (this.hi > this.lo && (now < this.min - 0.001 || now > this.max + 0.001)) return false;
         if (this.offer && !(this.pv(p).save > 0)) return false;
+        if (this.colour && !hasColour(p, this.colour)) return false;
         if (this.size && !(p.product_variants || []).some((v) => v && v.enable !== false && (v.type === this.size || v.volume === this.size))) return false;
         for (const k of Object.keys(this.f)) if (this.f[k].length && !this.f[k].includes(String(specValue(p, k)))) return false;
         return true;
@@ -387,6 +403,7 @@ export default {
       const out = [];
       for (const k of Object.keys(this.f)) for (const v of this.f[k]) out.push({ id: k + ":" + v, label: v, clear: () => this.toggle(k, v) });
       if (this.offer) out.push({ id: "offer", label: t("ly.ls.onOffer", "On offer"), clear: () => this.setOffer(false) });
+      if (this.colour) out.push({ id: "colour", label: this.colour, clear: () => this.setColour(this.colour) });
       if (this.size) out.push({ id: "size", label: t("av.ls.size", "Size {size}", { size: this.size }), clear: () => { this.size = ""; this.update(); } });
       if (this.hi > this.lo && (this.min > this.lo || this.max < this.hi))
         out.push({
@@ -613,6 +630,10 @@ export default {
       if (key === "new") return out.sort((a, b) => String(b.created_at || "").localeCompare(String(a.created_at || "")) || b.id - a.id);
       if (key === "saving") return out.sort((a, b) => this.pv(b).save - this.pv(a).save || a.id - b.id);
       return out;
+    },
+    setColour(name) {
+      this.colour = this.colour === name ? "" : name;
+      this.update();
     },
     resetRange() {
       this.min = this.lo;

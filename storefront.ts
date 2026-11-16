@@ -50,6 +50,7 @@ import { bootRegion, prepareLanguage } from "./components/region-switcher/region
 import { priceText } from "./components/kalio/i18n/price-text"; // money in sentences written as u-price writes it
 import { EN as LAYOUT_EN, LOADERS as LAYOUT_LANGUAGES } from "./components/kalio/i18n"; // the Kalio base + the Layout's own words
 import { bootI18n, i18nGlobals, loadLanguage } from "./components/kalio/i18n/kalio-i18n"; // the Layout's own words in the visitor's language (lazy per language)
+import { installShopData, loadShopData } from "./components/kalio/i18n/shop-data"; // the shop data Selldone does not translate (spec, pros, units), per language
 
 const vuetify = VuetifyInstance(i18n);
 // Vuetify's light error red reads 4.5:1 on white (its #ff5252 is 3.3:1); set
@@ -109,7 +110,10 @@ StorefrontSDK.Setup(); // Set up the Shop SDK.
 // mockup's "USD" pill; its panel says what the shop sells in).
 bootRegion(store, { showSingle: true, format: (amount, code, decimals) => priceText(amount, code, store.getters.getShop, { decimals }) });
 bootI18n(LAYOUT_EN, LAYOUT_LANGUAGES); // <html lang/dir>, and a language's words fetched when it is picked
-prepareLanguage((code) => loadLanguage(code)); // a picked language arrives with its words, never English first
+prepareLanguage((code) => Promise.all([loadLanguage(code), loadShopData(code)])); // a picked language arrives with its words, never English first
+// The shop's data Selldone does not translate itself (spec tables, pros, rating names, sale units) in the
+// visitor's language: components/kalio/i18n/shop-data.ts with data/<lang>.json.
+installShopData(window.axios);
 
 // ━━━ Community SDK (capi) ━━━
 CapiCommunity.Setup(); // Setup community.
