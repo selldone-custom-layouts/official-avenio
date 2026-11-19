@@ -1,25 +1,37 @@
 /*
- * The guest checkout walk on a live shop, up to Selldone's payment window. Never further.
- * (Galio's galio-checkout-walk.mjs with the Layout's markup.)
+ * The guest checkout walk on a live shop, up to the Place order button (PLACE=1: up to Selldone's payment
+ * window). Never further. (Galio's galio-checkout-walk.mjs with the Layout's markup.)
  *
  * For each width (1440 desktop, 390 phone), in a fresh browser (so a fresh guest basket):
- *   home → one piece in the bag (Today's selection's first "Add to bag") → the bag drawer → Checkout →
- *   contact (fake) → every delivery way the shop offers, one after the other (and a window when the way
- *   has windows) → the delivery sheet ("Compare the options") → the address sheet as the shop has it
- *   (map on: a pin, then the details; map off: the form), fake details, Save → for each way: "Place order",
- *   which only opens Selldone's payment window → a screenshot → the window's ✕. At the end the bag is
- *   emptied again.
+ *   home → the skin's product (checks.product) through the router, its first size in stock, "Add to bag"
+ *   → the bag drawer → Checkout → contact (fake) → when the Delivery card has no way yet (the shop's ways
+ *   depend on the address: a courier's radius), its note, then the address first, at the skin's
+ *   checks.walkPlace (WALK_PLACE) through the sheet's search → every delivery way the shop offers, one after
+ *   the other (and a window when the way has windows) → the delivery sheet ("Compare the options") → the
+ *   address sheet as the shop has it (map on: a pin or the walk place, then the details; map off: the form),
+ *   fake details, Save → for each way: the Place order button, ready and not pressed (PLACE=1: pressed, which
+ *   only opens Selldone's payment window → a screenshot → the window's ✕). At the end the bag is emptied.
  *
- * Nothing is ordered: nothing inside the payment window is touched but its ✕, and every Selldone /buy/
- * call is blocked here as a second guard (it would be logged as BLOCKED).
+ * Nothing is ordered: by default nothing past the receipt is pressed; with PLACE=1 nothing inside the payment
+ * window is touched but its ✕, and every Selldone /buy/ call is blocked here as a second guard (BLOCKED).
  *
  * Usage: node --use-system-ca scripts/checkout-walk.mjs [base] [out-folder]
  *   base default the skin's live domain (skins/<name>/skin.json shop.domain) · out default .shots/walk · WIDTHS=1440,390 · MODE=light|dark
+ *   PRODUCT=<id> · WALK_PLACE="<city, country>" · PLACE=1 (only on the owner's OK)
  *   PW=<path to playwright's index.js> (default: the "playwright" package)
  * Prints every step, then "WALK OK" or "WALK PROBLEMS n".
  */
 import { createRequire as __cr } from "node:module";
-const { shopUrl: __shopUrl } = __cr(import.meta.url)("./lib/skin.cjs");
+const { shopUrl: __shopUrl, readSkin: __readSkin, storageKey: __storageKey } = __cr(import.meta.url)("./lib/skin.cjs");
+const SKIN = __readSkin().skin;
+const THEME_KEY = __storageKey("theme", SKIN);
+const BRAND = SKIN.palettes?.brand || "tan";
+/* Avenio: the piece comes from the product page (sizes first), not from a home row */
+const PRODUCT = String(process.env.PRODUCT || SKIN.checks?.product || "");
+/* where the walk's address goes, when the shop's ways depend on it (a courier's radius): a place the address search finds */
+const WALK_PLACE = process.env.WALK_PLACE ?? SKIN.checks?.walkPlace ?? "";
+/* Place order opens Selldone's payment window; the walk stops one step before it unless PLACE=1 */
+const PLACE = process.env.PLACE === "1";
 import fs from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -52,12 +64,14 @@ for (const W of WIDTHS) {
   const H = W < 768 ? 844 : 900;
   console.log(`\n=== ${W}×${H} ${MODE}`);
   const ctx = await browser.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 1, isMobile: W < 768, hasTouch: W < 768 });
-  await ctx.addInitScript((mode) => {
+  await ctx.addInitScript((m) => {
     try {
-      localStorage.setItem("ly-theme", JSON.stringify({ palette: "tan", mode }));
+      localStorage.setItem(m.key, JSON.stringify({ palette: m.palette, mode: m.mode }));
     } catch {}
-  }, MODE);
+  }, { key: THEME_KEY, palette: BRAND, mode: MODE });
   const page = await ctx.newPage();
+  /* no step may wait forever (a click on something covered waited 5 min on the phone): fail it, say where */
+  page.setDefaultTimeout(60000);
   const errors = [];
   const blocked = [];
   page.on("pageerror", (e) => errors.push(String(e).slice(0, 240)));
@@ -77,19 +91,42 @@ for (const W of WIDTHS) {
   const push = (to) => page.evaluate((p) => window.$global_router.push(p).catch(() => {}), to);
   const visible = (sel) => page.locator(sel).filter({ visible: true }).first();
   const ways = () => page.locator("#co-delivery .mcs label.mc");
+  /* a way's card by its title: the cards arrive with the bill, so their order can change while it loads */
+  const wayCard = (name) => ways().filter({ has: page.locator(".mc-t", { hasText: name }) }).first();
 
   try {
     // ── home and one piece in the bag
     await page.goto(BASE + "/", { waitUntil: "domcontentloaded", timeout: 120000 });
     await page.waitForSelector(".ly .ftr", { timeout: 90000 });
-    await page.waitForSelector(".ly .srow .add", { timeout: 60000 });
     await sleep(2500);
-    const addBtn = page.locator(".ly .srow .add").first();
+    /* the product page through the router (a cold /product/ load gets Selldone's static SEO page headless) */
+    await push("/product/" + PRODUCT);
+    await page.waitForSelector(".ly .pd-buy, .ly button.btn.add", { timeout: 60000 });
+    await sleep(4000);
+    const size = visible(".av-g:not(.g-color) .av-o:not(.-out)");
+    let sizeName = "";
+    if (await size.count()) {
+      sizeName = ((await size.textContent()) || "").trim();
+      await size.click();
+      await sleep(900);
+    }
+    const piece = await page.evaluate(() => document.querySelector(".ly h1")?.textContent?.trim());
+    const addBtn = visible(".pd-buy button.btn.add, button.btn.add");
     await addBtn.scrollIntoViewIfNeeded();
-    const piece = await page.evaluate(() => document.querySelector(".ly .srow")?.querySelector(".s-t")?.textContent?.trim());
     await addBtn.click();
-    console.log(`  added one piece: ${piece || "(first row)"}`);
     await sleep(3500);
+    if (await page.locator("#lg-m").filter({ visible: true }).count()) {
+      bad(W, "Add to bag opened the sign-in sheet (guest checkout is off)");
+      await shot("00-signin");
+      throw new Error("no guest bag");
+    }
+    console.log(`  added one piece: ${piece || "(product " + PRODUCT + ")"}${sizeName ? " · size " + sizeName : ""}`);
+    await shot("00-product");
+    /* a drawer that opened by itself after Add to bag: close it, then open it from the header as a buyer would */
+    if (await page.locator("#drawer.open").count()) {
+      await page.keyboard.press("Escape");
+      await sleep(1000);
+    }
 
     // ── the bag drawer
     await visible(".bag-btn").click();
@@ -120,21 +157,100 @@ for (const W of WIDTHS) {
     }
     await sleep(2500);
 
+    // ── the address sheet (first, when the shop's ways depend on where the order goes)
+    const setAddress = async () => {
+        const addrBtn = page.locator("#co-address .addr-add, #co-address .addr-card .qlink").first();
+        await addrBtn.scrollIntoViewIfNeeded();
+        await addrBtn.click();
+        await page.waitForSelector(".k-addr__grid", { timeout: 20000 });
+        await sleep(4000);
+        const hasMap = await page.evaluate(() => !!document.querySelector(".k-addr__map"));
+        console.log(`  address sheet open, map ${hasMap ? "on" : "off"} (the shop's option)`);
+        await shot(`05-address-map-${hasMap ? "on" : "off"}`);
+        if (hasMap) {
+          if (WALK_PLACE) {
+            const q = page.locator(".k-addr input[type=search]").filter({ visible: true }).first();
+            await q.fill(WALK_PLACE);
+            await page.waitForSelector(".k-addr__results button", { state: "visible", timeout: 15000 }).catch(() => bad(W, `the address search found nothing for "${WALK_PLACE}"`));
+            await sleep(1200);
+            await page.locator(".k-addr__results button").filter({ visible: true }).first().click().catch(() => {});
+          } else await page.locator(".k-addr__pin svg").click().catch(() => {});
+          await sleep(5000);
+          const found = await page.evaluate(() => document.querySelector(".k-addr__found b")?.textContent?.trim());
+          console.log(`  pin placed; address under it: ${found}`);
+          if (await page.evaluate(() => !!document.querySelector(".k-addr__grid.-step-map"))) {
+            await page.locator(".k-sheet__foot .k-sheet__go").click();
+            await sleep(1500);
+          }
+        }
+        const fill = async (sel, v, force = false) => {
+          const el = page.locator(sel).first();
+          if (!(await el.count())) return;
+          if (force || !(await el.inputValue())) await el.fill(v);
+        };
+        await fill('.k-addr__field input[autocomplete="street-address"]', "12 Walk Street");
+        await fill('.k-addr__field input[placeholder="No."]', "12");
+        await fill('.k-addr__field input[autocomplete="name"]', "Test Walk", true);
+        await fill('.k-addr__field input[autocomplete="tel"]', "+1 415 555 0199", true);
+        await fill('.k-addr__field input[autocomplete="address-level2"]', WALK_PLACE ? WALK_PLACE.split(",")[0].trim() : "San Francisco");
+        await fill('.k-addr__field input[autocomplete="postal-code"]', "94105");
+        await fill(".k-addr__field textarea", "Ring twice (test walk)", true);
+        await sleep(800);
+        await shot("06-address-details");
+        await page.locator(".k-sheet__foot .k-sheet__go").click();
+        await sleep(5000);
+        const left = await page.evaluate(() => !!document.querySelector(".k-addr__grid"));
+        const missing = await page.evaluate(() => document.querySelector(".k-addr__missing")?.textContent?.trim());
+        if (left) bad(W, `the address sheet stayed open after Save${missing ? ": " + missing : ""}`);
+        const set = await page.evaluate(() => (document.querySelector("#co-address .addr-card")?.textContent || "(no address card)").replace(/\s+/g, " ").trim());
+        console.log(`  address saved: ${set}`);
+        await shot("07-address-set", true);
+    };
+    const readWays = () =>
+      page.evaluate(() =>
+        [...document.querySelectorAll("#co-delivery .mcs label.mc")].map((b) => [b.querySelector(".mc-t"), b.querySelector(".mc-f"), b.querySelector(".mc-n")].map((x) => x?.textContent?.trim() || "").join(" | ")),
+      );
+
+    /* the bill brings the ways in more than one step (Fashioni: the pickup first, the courier a moment later):
+       read them only once the list has stopped changing for 3 s */
+    const settleWays = async () => {
+      let last = null;
+      let same = 0;
+      let got = [];
+      for (let k = 0; k < 25 && same < 3; k++) {
+        await sleep(1000);
+        got = await readWays();
+        const key = got.join("\n");
+        same = key === last ? same + 1 : 0;
+        last = key;
+      }
+      return got;
+    };
+
     // ── every delivery way
-    const list = await page.evaluate(() =>
-      [...document.querySelectorAll("#co-delivery .mcs label.mc")].map((b) => [b.querySelector(".mc-t"), b.querySelector(".mc-f"), b.querySelector(".mc-n")].map((x) => x?.textContent?.trim() || "").join(" | ")),
-    );
+    let list = await settleWays();
+    let addressFirst = false;
+    if (!list.length) {
+      const note = await page.evaluate(() => document.querySelector("#co-delivery .ly-noway b")?.textContent?.trim());
+      console.log(`  no way before an address; the Delivery card says: "${note || "(nothing)"}"`);
+      if (!note) bad(W, "the Delivery card is empty and says nothing");
+      await page.locator("#co-delivery").screenshot({ path: path.join(OUT, `walk-${W}-03-no-way-yet.png`) });
+      await setAddress();
+      addressFirst = true;
+      list = await settleWays();
+    }
     console.log(`  delivery ways (${list.length}):`);
     list.forEach((w, i) => console.log(`    ${i + 1}. ${w}`));
     if (!list.length) bad(W, "the Delivery card shows no way");
     const wayInfo = [];
     for (let i = 0; i < list.length; i++) {
-      const card = ways().nth(i);
+      const name = list[i].split(" | ")[0];
+      const card = wayCard(name);
       await card.scrollIntoViewIfNeeded();
       await card.click();
       await sleep(3500);
-      const st = await page.evaluate((i) => {
-        const c = document.querySelectorAll("#co-delivery .mcs label.mc")[i];
+      const st = await page.evaluate((name) => {
+        const c = [...document.querySelectorAll("#co-delivery .mcs label.mc")].find((b) => b.querySelector(".mc-t")?.textContent?.trim() === name);
         const chips = [...document.querySelectorAll("#co-delivery .wins .wchip")];
         return {
           checked: !!c?.querySelector("input")?.checked,
@@ -143,8 +259,7 @@ for (const W of WIDTHS) {
           addressH: document.querySelector("#co-address h2")?.textContent?.trim(),
           receipt: (document.querySelector("#co-pay")?.innerText || "").replace(/\s+/g, " ").match(/(Delivery|Pickup|Shipping)[^$]*\$?[\d.,]*|Free/i)?.[0] || "",
         };
-      }, i);
-      const name = list[i].split(" | ")[0];
+      }, name);
       console.log(`  way ${i + 1} "${name}": checked=${st.checked} windows=[${st.chips.join(", ")}]${st.date ? " date-field" : ""} address-card="${st.addressH}" receipt="${st.receipt}"`);
       if (!st.checked) bad(W, `way "${name}" did not become the chosen one`);
       /* a way without windows must not carry the window of the way before it */
@@ -164,11 +279,13 @@ for (const W of WIDTHS) {
 
     // ── the delivery sheet
     const cmp = page.locator("#co-delivery [aria-controls=dlvm]");
+    let sheetRows = [];
     if (await cmp.count()) {
       await cmp.click();
       await page.waitForSelector("#dlvm .dls .dl", { state: "visible", timeout: 15000 }).catch(() => bad(W, "the delivery sheet shows no way"));
       await sleep(1500);
       const rows = await page.evaluate(() => [...document.querySelectorAll("#dlvm .dls .dl .dl-t b")].map((b) => b.textContent.replace(/\s+/g, " ").trim()));
+      sheetRows = rows;
       console.log(`  delivery sheet: ${rows.length} row(s): ${rows.join(" / ")}`);
       await shot("04-delivery-sheet");
       const done = page.locator("#dlvm .btn").filter({ hasText: /done/i }).first();
@@ -178,61 +295,61 @@ for (const W of WIDTHS) {
     }
 
     // ── a way that needs an address, then the address sheet
-    const home = wayInfo.find((w) => !w.pickup);
-    if (home) {
-      await ways().nth(home.i).click();
-      await sleep(3000);
-      const firstChip = page.locator("#co-delivery .wins .wchip:not([disabled])").first();
-      if (await firstChip.count()) {
-        await firstChip.click();
-        await sleep(2000);
-      }
-      const addrBtn = page.locator("#co-address .addr-add, #co-address .addr-card .qlink").first();
-      await addrBtn.scrollIntoViewIfNeeded();
-      await addrBtn.click();
-      await page.waitForSelector(".k-addr__grid", { timeout: 20000 });
-      await sleep(4000);
-      const hasMap = await page.evaluate(() => !!document.querySelector(".k-addr__map"));
-      console.log(`  address sheet open, map ${hasMap ? "on" : "off"} (the shop's option)`);
-      await shot(`05-address-map-${hasMap ? "on" : "off"}`);
-      if (hasMap) {
-        await page.locator(".k-addr__pin svg").click().catch(() => {});
-        await sleep(5000);
-        const found = await page.evaluate(() => document.querySelector(".k-addr__found b")?.textContent?.trim());
-        console.log(`  pin placed; address under it: ${found}`);
-        if (await page.evaluate(() => !!document.querySelector(".k-addr__grid.-step-map"))) {
-          await page.locator(".k-sheet__foot .k-sheet__go").click();
-          await sleep(1500);
+    if (!addressFirst) {
+      const home = wayInfo.find((w) => !w.pickup);
+      if (home) {
+        await wayCard(home.name).click();
+        await sleep(3000);
+        const firstChip = page.locator("#co-delivery .wins .wchip:not([disabled])").first();
+        if (await firstChip.count()) {
+          await firstChip.click();
+          await sleep(2000);
         }
+        await setAddress();
+      } else {
+        /* the card offers only the pickup until there is an address (Fashioni: its courier reaches 30 km around
+           the store), while the delivery sheet lists every way: pick the courier there, then the address */
+        const sheetOnly = sheetRows.filter((r) => !/pickup/i.test(r) && !wayInfo.some((w) => w.name === r));
+        if (sheetOnly.length && (await cmp.count())) {
+          const want = sheetOnly[0];
+          /* every step here has its own short limit and says where it is (the phone once hung here for 8 min) */
+          console.log(`  opening the delivery sheet again for "${want}"`);
+          await cmp.scrollIntoViewIfNeeded({ timeout: 15000 });
+          await cmp.click({ timeout: 15000 });
+          await page.waitForSelector("#dlvm .dls .dl", { state: "visible", timeout: 15000 });
+          await sleep(1000);
+          const row = page.locator("#dlvm .dls .dl").filter({ has: page.locator(".dl-t b", { hasText: want }) }).first();
+          console.log(`  the sheet is open; rows matching "${want}": ${await row.count()}`);
+          await row.locator("label.dl-hd").first().scrollIntoViewIfNeeded({ timeout: 15000 });
+          await row.locator("label.dl-hd").first().click({ timeout: 15000 });
+          console.log(`  clicked "${want}" in the sheet`);
+          /* the pick goes through a basket update and a new bill: give it up to 12 s */
+          let picked = false;
+          for (let k = 0; k < 12 && !picked; k++) {
+            await sleep(1000);
+            picked = await row.locator("input.rdo").first().isChecked({ timeout: 1000 }).catch(() => false);
+          }
+          console.log(`  "${want}" picked in the delivery sheet (it is not on the card before an address): ${picked ? "chosen" : "NOT chosen"}`);
+          if (!picked) bad(W, `"${want}" could not be chosen in the delivery sheet`);
+          await shot(`04b-sheet-${slug(want)}`);
+          const done = page.locator("#dlvm .btn").filter({ hasText: /done/i }).first();
+          if (await done.count()) await done.click();
+          else await page.keyboard.press("Escape");
+          await sleep(1500);
+          await setAddress();
+          const after = await settleWays();
+          console.log(`  delivery ways after the address (${after.length}):`);
+          after.forEach((w, i) => console.log(`    ${i + 1}. ${w}`));
+          for (const n of after.map((x) => x.split(" | ")[0])) if (!wayInfo.some((w) => w.name === n)) wayInfo.push({ name: n, pickup: /pickup/i.test(n) });
+          if (!after.some((x) => x.split(" | ")[0] === want)) bad(W, `"${want}" is still not on the card after an address at ${WALK_PLACE || "the pin"}`);
+        } else bad(W, "no way that needs an address");
       }
-      const fill = async (sel, v, force = false) => {
-        const el = page.locator(sel).first();
-        if (!(await el.count())) return;
-        if (force || !(await el.inputValue())) await el.fill(v);
-      };
-      await fill('.k-addr__field input[autocomplete="street-address"]', "12 Walk Street");
-      await fill('.k-addr__field input[placeholder="No."]', "12");
-      await fill('.k-addr__field input[autocomplete="name"]', "Test Walk", true);
-      await fill('.k-addr__field input[autocomplete="tel"]', "+1 415 555 0199", true);
-      await fill('.k-addr__field input[autocomplete="address-level2"]', "San Francisco");
-      await fill('.k-addr__field input[autocomplete="postal-code"]', "94105");
-      await fill(".k-addr__field textarea", "Ring twice (test walk)", true);
-      await sleep(800);
-      await shot("06-address-details");
-      await page.locator(".k-sheet__foot .k-sheet__go").click();
-      await sleep(5000);
-      const left = await page.evaluate(() => !!document.querySelector(".k-addr__grid"));
-      const missing = await page.evaluate(() => document.querySelector(".k-addr__missing")?.textContent?.trim());
-      if (left) bad(W, `the address sheet stayed open after Save${missing ? ": " + missing : ""}`);
-      const set = await page.evaluate(() => (document.querySelector("#co-address .addr-card")?.textContent || "(no address card)").replace(/\s+/g, " ").trim());
-      console.log(`  address saved: ${set}`);
-      await shot("07-address-set", true);
-    } else bad(W, "no way that needs an address");
+    }
 
     // ── each way: Place order → the payment window → its ✕
     for (const w of wayInfo) {
-      await ways().nth(w.i).scrollIntoViewIfNeeded();
-      await ways().nth(w.i).click();
+      await wayCard(w.name).scrollIntoViewIfNeeded();
+      await wayCard(w.name).click();
       await sleep(3500);
       const chip = page.locator("#co-delivery .wins .wchip:not([disabled])").first();
       if ((await chip.count()) && !(await page.locator("#co-delivery .wins .wchip[aria-checked='true']").count())) {
@@ -246,6 +363,14 @@ for (const W of WIDTHS) {
       }
       const label = (await place.textContent()).replace(/\s+/g, " ").trim();
       await place.scrollIntoViewIfNeeded();
+      if (!PLACE) {
+        /* the default: stop one step before Selldone's payment window (PLACE=1 opens it, on the owner's OK) */
+        const off = await place.isDisabled();
+        console.log(`  way "${w.name}": "${label}" ready${off ? " (DISABLED)" : ""}; not pressed (PLACE=1 opens the payment window)`);
+        if (off) bad(W, `way "${w.name}": the Place order button is disabled`);
+        await page.locator("#co-pay").screenshot({ path: path.join(OUT, `walk-${W}-08-ready-${slug(w.name)}.png`) });
+        continue;
+      }
       await place.click();
       const opened = await page
         .waitForSelector(".s--storefront-master-payment-dialog .v-card", { state: "visible", timeout: 20000 })
@@ -266,8 +391,8 @@ for (const W of WIDTHS) {
       console.log(`  way "${w.name}": "${label}" → payment window [${pay.box}]${pay.over ? " SIDE-SCROLL" : ""}: ${pay.text}`);
       if (pay.box[2] > W + 1 || pay.box[0] < -1) bad(W, `payment window is off the screen: ${pay.box}`);
       /* the button's total and the payment window's total are the same bill (a stale bill shows a different one) */
-      const btnTotal = (label.match(/$[d.,]+/) || [])[0];
-      const payTotal = (pay.text.match(/TOTAL PAYMENTs*($[d.,]+)/i) || [])[1];
+      const btnTotal = (label.match(/\$[\d.,]+/) || [])[0];
+      const payTotal = (pay.text.match(/TOTAL PAYMENT\s*(\$[\d.,]+)/i) || [])[1];
       if (btnTotal && payTotal && btnTotal !== payTotal) bad(W, `way "${w.name}": the button says ${btnTotal}, the payment window ${payTotal}`);
       await shot(`10-payment-${slug(w.name)}`);
       const x = page.locator(".s--storefront-master-payment-dialog .v-toolbar .v-btn").last();
