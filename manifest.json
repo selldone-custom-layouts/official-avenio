@@ -3,7 +3,7 @@
   "deploy_path": "",
   "package": "avenio-department-store",
   "name": "Avenio Department Store",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "storefront": true,
   "backoffice": false,
   "description": "A department-store Layout: a deals ticker, a department bar with five-column mega menus, an event band with department buttons, wide photo slides, deal rows, price-point tiles, brand tiles, a five-across listing with a filter drawer and colour prompt, and a two-column product page with size boxes, Add to bag + Buy now and pickup / delivery tiles. One wine-red colour family, crisp 4/8 px corners, DM Serif Display over Figtree."
