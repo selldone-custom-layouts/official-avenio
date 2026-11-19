@@ -236,9 +236,19 @@
               <div class="co-b">
                 <div class="co-hr">
                   <h2 id="co2" class="co-h">{{ t("ly.co.deliveryH", "Delivery") }}</h2>
-                  <button :aria-expanded="delivery_sheet ? 'true' : 'false'" aria-controls="dlvm" class="qlink" type="button" @click="openLayer('dlvm', $event.currentTarget)">
+                  <button v-if="show_when" :aria-expanded="delivery_sheet ? 'true' : 'false'" aria-controls="dlvm" class="qlink" type="button" @click="openLayer('dlvm', $event.currentTarget)">
                     {{ t("ly.co.compareWays", "Compare the options") }}<ly-icon name="arrow" />
                   </button>
+                </div>
+                <!-- No way to choose (yet): the shop's ways depend on the address (a courier's radius, a country),
+                     and a pickup without a pickup point is not a choice. Say why instead of an empty card. -->
+                <div v-if="!show_when" class="nogw-b ly-noway" role="status">
+                  <span class="em-ic sm"><ly-icon name="pin" /></span>
+                  <div>
+                    <b>{{ nx_has_address ? t("ly.co.noWayT", "No delivery to this address yet") : t("ly.co.wayFirstT", "Add your address to see the delivery options") }}</b>
+                    <p>{{ nx_has_address ? t("ly.co.noWayP", "None of the shop's delivery methods reaches it. Try another address, or contact the shop.") : t("ly.co.wayFirstP", "The methods and their fees depend on where the order goes.") }}</p>
+                    <button class="qlink" type="button" @click="openAddress()">{{ nx_has_address ? t("ly.co.otherAddress", "Use another address") : t("ly.co.addAddress", "Add your address") }}</button>
+                  </div>
                 </div>
                 <s-shop-connect-shipping-options
                   :basket="basket"
@@ -448,7 +458,16 @@
                   @update:model-value="selectDiscountCode"
                 />
               </div>
-              <div v-if="nx_no_gateway" class="nogw-b ly-nogw">
+              <!-- an address no way reaches: that is the reason, not the payment (COD needs a way) -->
+              <div v-if="nx_no_way && nx_has_address" class="nogw-b ly-nogw">
+                <span class="em-ic sm"><ly-icon name="pin" /></span>
+                <div>
+                  <b>{{ t("ly.co.noWayT", "No delivery to this address yet") }}</b>
+                  <p>{{ t("ly.co.noWayR", "Your bag is kept. Use another address, or ask the shop how it can reach you.") }}</p>
+                  <router-link :to="dmContactTo" class="qlink">{{ t("ly.co.contactShop", "Contact the shop") }}</router-link>
+                </div>
+              </div>
+              <div v-else-if="nx_no_gateway && !nx_no_way" class="nogw-b ly-nogw">
                 <span class="em-ic sm"><ly-icon name="lock" /></span>
                 <div>
                   <b>{{ t("ly.co.noPayT", "This shop is not taking payment right now") }}</b>
@@ -457,7 +476,7 @@
                 </div>
               </div>
               <p v-else-if="pay_blocker && !nx_missing.length" class="rc-note"><ly-icon name="info" />{{ pay_blocker }}</p>
-              <button v-if="!nx_no_gateway" :disabled="busy_submit" class="btn block place" type="button" @click="nx_place">
+              <button v-if="nx_no_way ? !nx_has_address : !nx_no_gateway" :disabled="busy_submit" class="btn block place" type="button" @click="nx_place">
                 <span v-if="busy_save || busy_bill || busy_submit" aria-hidden="true" class="spin"></span>{{ pr_place_label }}
               </button>
               <p class="rc-note"><ly-icon name="lock" />{{ nx_cod_only ? t("ly.co.nothingOnline", "Nothing is charged online.") : t("ly.co.payNext", "You choose how to pay in the next step.") }}</p>
@@ -1053,6 +1072,10 @@ export default {
       return this.transportation_list.some(
         (t) => t.type !== ShopTransportations.Pickup.code || t.pickups?.length,
       );
+    },
+    /** A physical basket with nothing to choose in the Delivery card (no address yet, or an address no way reaches). */
+    nx_no_way() {
+      return !!(this.has_delivery && !this.isService && this.bill && !this.show_when);
     },
     transportation_now() {
       const type = this.delivery_info?.type;
