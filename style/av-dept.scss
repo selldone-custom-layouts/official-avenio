@@ -354,3 +354,13 @@ a.tk-l:hover:is(.ly,.ly *) { color: var(--ly-top-hover); }
 .mm-tile:is(.ly,.ly *) b { font: 700 14.5px/1.3 var(--ly-sans); }
 .mm-off:is(.ly,.ly *) { font: 600 13px/1.3 var(--ly-sans); color: var(--ly-act-text); }
 .mm-wait:is(.ly,.ly *) { margin: 0; min-height: 120px; font: 500 14px/1.5 var(--ly-sans); color: var(--ly-muted); }
+
+/* A product photo without a cut-out on Avenio's own plates (the flag cards, a department or mega-menu tile without
+   its own photo): multiplied onto the plate, and in dark mode on the family's lightest tint (see style/ly/look.css).
+   The four flag cards take that light plate in dark mode whatever their photo, like the product cards. */
+html:not(.ly-dark) :is(.fl-ph, .mm-ph.plate, .dp-ph.plate):is(.ly,.ly *) img:is([src*=".jpg" i], [src*=".jpeg" i]),
+html.ly-dark :is(.fl-ph, .mm-ph.plate, .dp-ph.plate):is(.ly,.ly *) img:is([src*=".jpg" i], [src*=".jpeg" i]) { mix-blend-mode: multiply; }
+html.ly-dark :is(.mm-ph.plate, .dp-ph.plate):is(.ly,.ly *):has(img:is([src*=".jpg" i], [src*=".jpeg" i])),
+html.ly-dark .fl-ph:is(.ly,.ly *) { background: var(--ly-dark-ink); }
+/* the flag card's label sits on that plate: it keeps the family-dark look so it does not melt into it */
+html.ly-dark .fl-f:is(.ly,.ly *) { background: var(--ly-dark); color: var(--ly-dark-ink); }
